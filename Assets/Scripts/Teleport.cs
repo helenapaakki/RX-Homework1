@@ -1,40 +1,37 @@
-using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Teleport : MonoBehaviour
 {
-    public XROrigin origin;
-    public Transform teleport;
-    public InputActionReference button;
+    public InputActionReference action;
+    public Transform headset;
+    public Transform teleportLocation;
+    public Transform originalPosition;
 
-    private Vector3 originalPosition;
     private bool isTeleported = false;
-
-    void OnEnable()
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        button.action.Enable();
-        button.action.performed += OnTeleportPressed;
+        
     }
 
-    void OnDisable()
+    // Update is called once per frame
+    void Update()
     {
-        button.action.performed -= OnTeleportPressed;
-        button.action.Disable();
-    }
-
-    void OnTeleportPressed(InputAction.CallbackContext ctx)
-    {
-        if (!isTeleported)
+        action.action.Enable();
+        action.action.performed += (ctx) =>
         {
-            originalPosition = origin.Camera.transform.position;
-            origin.MoveCameraToWorldLocation(teleport.position);
-        }
-        else
-        {
-            origin.MoveCameraToWorldLocation(originalPosition);
-        }
-        isTeleported = !isTeleported;
-    }
 
+            if (isTeleported)
+            {
+                headset.position = originalPosition.position;
+                isTeleported = false;
+            } else
+            {
+                headset.position = teleportLocation.position;
+                isTeleported = true;
+            }
+        };
+
+    }
 }
